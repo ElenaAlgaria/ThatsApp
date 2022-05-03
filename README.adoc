@@ -6,8 +6,9 @@
 
 === Kompatibel mit der App von
 
-* _Vorname Nachname_, _repository-link_
-* _Vorname Nachname_, _repository-link_
+* Milena Rudig, https://github.com/emoba-fhnw/thatsapp-fs22-MilenaRudig.git
+* Martin Ott, https://github.com/emoba-fhnw/thatsapp-fs22-MartinOtt.git
+* Juliane Valley, https://github.com/emoba-fhnw/thatsapp-fs22-JulianeVfhnw.git
 
 === Herausstellungsmerkmal meiner App
 
