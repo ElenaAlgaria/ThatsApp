@@ -4,21 +4,16 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.android.animation.SegmentType
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -57,25 +52,29 @@ private fun Bar(model: ThatsAppModel) {
 @Composable
 private fun Body(model: ThatsAppModel) {
     with(model) {
-
-        //   Panini(bitmap = imagePic, modifier = Modifier.fillMaxSize())
-
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-            val (pic, name) = createRefs()
+            val (pic, name, greeting) = createRefs()
 
             val margin = 20.dp
 
-            Image(imagePic, modifier = Modifier.constrainAs(pic) {
+            ImageProfil(imagePic, modifier = Modifier.constrainAs(pic) {
                 top.linkTo(parent.top, margin)
                 start.linkTo(parent.start, margin)
                 end.linkTo(parent.end, margin)
                 width = Dimension.fillToConstraints
             })
 
-            ProfilTxt("Name", model, Modifier.constrainAs(name) {
-                start.linkTo(parent.start,margin)
+            ProfilName("Name", model, Modifier.constrainAs(name) {
+                start.linkTo(parent.start,35.dp)
                 top.linkTo(pic.bottom, margin)
-                end.linkTo(parent.end, margin)
+                end.linkTo(parent.end, 35.dp)
+                width = Dimension.fillToConstraints
+            })
+
+            ProfilTxt("Status", model, Modifier.constrainAs(greeting) {
+                start.linkTo(parent.start,35.dp)
+                top.linkTo(name.bottom, margin)
+                end.linkTo(parent.end, 35.dp)
                 width = Dimension.fillToConstraints
             })
 
@@ -84,7 +83,7 @@ private fun Body(model: ThatsAppModel) {
 }
 
 @Composable
-private fun ProfilTxt(textLbl: String, model: ThatsAppModel, modifier: Modifier) {
+private fun ProfilName(textLbl: String, model: ThatsAppModel, modifier: Modifier) {
     with(model){
         TextField(
             value = me,
@@ -98,10 +97,25 @@ private fun ProfilTxt(textLbl: String, model: ThatsAppModel, modifier: Modifier)
         )
     }
 
+}@Composable
+private fun ProfilTxt(textLbl: String, model: ThatsAppModel, modifier: Modifier) {
+    with(model){
+        TextField(
+            value = greeting,
+            onValueChange = {greeting = it},
+            textStyle = MaterialTheme.typography.subtitle1,
+           singleLine = true,
+            colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White, focusedLabelColor = Color.DarkGray),
+            label = { Text(text = textLbl)},
+            modifier = modifier
+
+        )
+    }
+
 }
 
 @Composable
-private fun Image(bitmap: ImageBitmap, modifier: Modifier) {
+private fun ImageProfil(bitmap: ImageBitmap, modifier: Modifier) {
     Image(
         bitmap = bitmap,
         contentDescription = "",

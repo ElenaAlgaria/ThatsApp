@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import fhnw.emoba.R
 import fhnw.emoba.modules.module07.flutter_solution.data.MqttConnector
 import fhnw.emoba.modules.module07.flutter_solution.model.Flap
-import org.json.JSONObject
+import fhnw.emoba.thatsapp.data.People
 
 class ThatsAppModel(private val context: ComponentActivity) {
     val title      = "ThatsApp"
@@ -26,12 +26,21 @@ class ThatsAppModel(private val context: ComponentActivity) {
     var flapsPublished      by mutableStateOf(0)
     var message             by mutableStateOf("Hi")
     var me         by  mutableStateOf("Elena")
+    var greeting         by  mutableStateOf("The world needs more love")
 
     var currentScreen by mutableStateOf(AvailableScreen.CHAT)
     val imagePic   = loadImage(R.drawable.character)
 
     private val mqttConnector by lazy { MqttConnector(mqttBroker) }
     private val soundPlayer   by lazy { MediaPlayer.create(context, R.raw.exp) }
+
+    var chatList = mutableStateListOf<People>()
+
+    fun handlePeople(){
+        chatList.add(People("Leo",message, loadImage(R.drawable.bob)))
+        chatList.add(People("Milena", message, loadImage(R.drawable.agnes)))
+        chatList.add(People("Martin", message, loadImage(R.drawable.kevin)))
+    }
 
     fun connectAndSubscribe(){
         mqttConnector.connectAndSubscribe(
