@@ -11,6 +11,7 @@ import fhnw.emoba.thatsapp.model.PhotoBoothModel
 import fhnw.emoba.thatsapp.model.ThatsAppModel
 import fhnw.emoba.thatsapp.ui.screens.OverviewChat
 import fhnw.emoba.thatsapp.ui.screens.Profil
+import fhnw.emoba.thatsapp.ui.screens.Roboto
 
 
 @Composable
@@ -22,30 +23,6 @@ fun AppUI(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel) {
         )
     }
 }
-/*
-@Composable
-private fun Bar(model: ThatsAppModel) {
-    with(model) {
-        TopAppBar(
-            title = { Text(title) },
-            navigationIcon = {
-                IconButton(onClick = {}) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-                }
-            },
-            actions = {
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(Icons.Filled.Person, contentDescription = "Profil")
-                }
-            },
-            contentColor = Color.Black,
-            modifier = Modifier.clip(RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
-        )
-    }
-}
-
- */
-
 
 @Composable
 private fun Body(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel) {
@@ -60,6 +37,9 @@ private fun Body(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel) {
                    }
                    AvailableScreen.PROFIL -> {
                         Profil(model = model)
+                   }
+                   AvailableScreen.ROBOTO -> {
+                       Roboto(model = model)
                    }
                }
 

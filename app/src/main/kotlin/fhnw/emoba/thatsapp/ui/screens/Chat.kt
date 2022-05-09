@@ -63,11 +63,6 @@ private fun Bar(model: ThatsAppModel) {
                     Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                 }
             },
-            actions = {
-                IconButton(onClick = { currentScreen = AvailableScreen.PROFIL }) {
-                    Icon(Icons.Filled.Person, contentDescription = "Profil")
-                }
-            },
             contentColor = Color.Black,
             modifier = Modifier.clip(RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
         )

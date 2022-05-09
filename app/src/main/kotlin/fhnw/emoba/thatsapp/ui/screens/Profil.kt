@@ -39,7 +39,7 @@ private fun Bar(model: ThatsAppModel) {
         TopAppBar(
             title = { Text("Profil") },
             navigationIcon = {
-                IconButton(onClick = { currentScreen = AvailableScreen.CHAT }) {
+                IconButton(onClick = { currentScreen = AvailableScreen.OVERVIEW }) {
                     Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                 }
             },

@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
@@ -36,11 +37,22 @@ fun OverviewChat(model: ThatsAppModel) {
     MaterialTheme(colors = lightColors(primary = lightBlue100)) {
         Scaffold(scaffoldState = scaffoldState,
             topBar = { Bar(model) },
+            floatingActionButton = { AddPerson(model)},
             content = { Body(model) }
         )
     }
 
 }
+
+@Composable
+fun AddPerson(model: ThatsAppModel){
+    with(model){
+        FloatingActionButton(onClick = { currentScreen = AvailableScreen.ROBOTO }) {
+            Icon(Icons.Filled.Add, contentDescription = "add person")
+        }
+    }
+}
+
 @Composable
 private fun Bar(model: ThatsAppModel) {
     with(model) {
@@ -61,12 +73,13 @@ private fun Bar(model: ThatsAppModel) {
 private fun Body(model: ThatsAppModel) {
     val state = rememberLazyListState()
     with(model) {
-        LazyColumn(state = state, modifier = Modifier.fillMaxWidth()){
-            items(chatList){
+        LazyColumn(state = state, modifier = Modifier.fillMaxWidth()) {
+            items(chatList) {
                 Overview(it, model)
             }
         }
     }
+
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -77,21 +90,27 @@ fun Overview(it: People, model: ThatsAppModel) {
             .padding(10.dp)
             .fillMaxWidth(),
             onClick = {
-             //   setTrack(trackList.indexOf(it), it, it.album,it.artist)
+                title = it.name
                 currentScreen = AvailableScreen.CHAT
             }) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                ListItem(text = {  Text(
-                    text = it.name, fontSize = 18.sp
-                )}, secondaryText = {Text(
-                    text = it.text, modifier = Modifier
-                        .padding(10.dp)
-                        .align(
-                            Alignment.Start
-                        ), fontSize = 14.sp, color = Color.DarkGray
-                )})
-                    ImageProfil(it.loadImage)
+            Row(verticalAlignment = Alignment.CenterVertically) {
 
+                ImageProfil(it.loadImage)
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    ListItem(text = {
+                        Text(
+                            text = it.name, fontSize = 18.sp
+                        )
+                    }, secondaryText = {
+                        Text(
+                            text = it.text, modifier = Modifier
+                                .padding(10.dp)
+                                .align(
+                                    Alignment.Start
+                                ), fontSize = 14.sp, color = Color.DarkGray
+                        )
+                    })
+                }
 
             }
         }
@@ -104,7 +123,9 @@ private fun ImageProfil(image: ImageBitmap) {
         bitmap = image,
         contentDescription = "",
         contentScale = ContentScale.Crop,
-        modifier = Modifier.graphicsLayer(
-            shape = CircleShape)
+        modifier = Modifier
+            .clip(CircleShape)
+            .size(80.dp)
+            .padding(10.dp)
         )
 }

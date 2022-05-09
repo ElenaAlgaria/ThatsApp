@@ -16,7 +16,7 @@ import fhnw.emoba.modules.module07.flutter_solution.model.Flap
 import fhnw.emoba.thatsapp.data.People
 
 class ThatsAppModel(private val context: ComponentActivity) {
-    val title      = "ThatsApp"
+    var title      = ""
     val mqttBroker = "broker.hivemq.com"
     val mainTopic  = "fhnw/emoba/thatsapp"
     val allFlaps = mutableStateListOf<Flap>()
@@ -28,7 +28,7 @@ class ThatsAppModel(private val context: ComponentActivity) {
     var me         by  mutableStateOf("Elena")
     var greeting         by  mutableStateOf("The world needs more love")
 
-    var currentScreen by mutableStateOf(AvailableScreen.CHAT)
+    var currentScreen by mutableStateOf(AvailableScreen.OVERVIEW)
     val imagePic   = loadImage(R.drawable.character)
 
     private val mqttConnector by lazy { MqttConnector(mqttBroker) }
@@ -37,9 +37,11 @@ class ThatsAppModel(private val context: ComponentActivity) {
     var chatList = mutableStateListOf<People>()
 
     fun handlePeople(){
-        chatList.add(People("Leo",message, loadImage(R.drawable.bob)))
-        chatList.add(People("Milena", message, loadImage(R.drawable.agnes)))
-        chatList.add(People("Martin", message, loadImage(R.drawable.kevin)))
+        chatList.add(People("Leo",message, loadImage(R.drawable.leo)))
+        chatList.add(People("Milena", message, loadImage(R.drawable.milena)))
+        chatList.add(People("Martin", message, loadImage(R.drawable.martin)))
+        chatList.add(People("Lea", message, loadImage(R.drawable.lea)))
+
     }
 
     fun connectAndSubscribe(){
@@ -68,7 +70,7 @@ class ThatsAppModel(private val context: ComponentActivity) {
         soundPlayer.start()
     }
 
-    private fun loadImage(@DrawableRes id: Int) : ImageBitmap {
+    fun loadImage(@DrawableRes id: Int) : ImageBitmap {
         return BitmapFactory.decodeResource(context.resources, id).asImageBitmap()
     }
 }
