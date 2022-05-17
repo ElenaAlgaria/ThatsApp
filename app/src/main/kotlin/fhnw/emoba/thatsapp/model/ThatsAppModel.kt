@@ -13,7 +13,12 @@ import androidx.compose.ui.graphics.asImageBitmap
 import fhnw.emoba.R
 import fhnw.emoba.modules.module07.flutter_solution.data.MqttConnector
 import fhnw.emoba.modules.module07.flutter_solution.model.Flap
+import fhnw.emoba.thatsapp.data.Fact
 import fhnw.emoba.thatsapp.data.People
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 class ThatsAppModel(private val context: ComponentActivity) {
     var title      = ""
@@ -35,6 +40,15 @@ class ThatsAppModel(private val context: ComponentActivity) {
     private val soundPlayer   by lazy { MediaPlayer.create(context, R.raw.exp) }
 
     var chatList = mutableStateListOf<People>()
+
+    val phrases = mutableStateListOf<String>()
+    private val modelScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    fun nextPhrase() {
+        modelScope.launch {
+            phrases.add(Fact.generateMsg())
+        }
+    }
 
     fun handlePeople(){
         chatList.add(People("Leo",message, loadImage(R.drawable.leo)))

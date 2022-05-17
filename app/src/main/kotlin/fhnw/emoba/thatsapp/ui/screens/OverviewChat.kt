@@ -11,9 +11,8 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,7 +47,7 @@ fun OverviewChat(model: ThatsAppModel) {
 fun AddPerson(model: ThatsAppModel){
     with(model){
         FloatingActionButton(onClick = { currentScreen = AvailableScreen.ROBOTO }) {
-            Icon(Icons.Filled.Add, contentDescription = "add person")
+            Icon(Icons.Filled.Psychology, contentDescription = "fatcs", Modifier.size(36.dp))
         }
     }
 }
