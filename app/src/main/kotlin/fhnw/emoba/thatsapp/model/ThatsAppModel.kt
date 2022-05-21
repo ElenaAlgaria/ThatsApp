@@ -1,5 +1,6 @@
 package fhnw.emoba.thatsapp.model
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaPlayer
 import androidx.activity.ComponentActivity
@@ -12,9 +13,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import fhnw.emoba.R
 import fhnw.emoba.modules.module07.flutter_solution.data.MqttConnector
-import fhnw.emoba.modules.module07.flutter_solution.model.Flap
-import fhnw.emoba.thatsapp.data.Fact
-import fhnw.emoba.thatsapp.data.People
+import fhnw.emoba.modules.module09.gps.data.GeoPosition
+import fhnw.emoba.thatsapp.data.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -26,13 +26,15 @@ class ThatsAppModel(private val context: ComponentActivity) {
     val mainTopic  = "fhnw/emoba/thatsapp"
     val allFlaps = mutableStateListOf<Flap>()
 
-
     var notificationMessage by mutableStateOf("")
-    var flapsPublished      by mutableStateOf(0)
-    var message             by mutableStateOf("Hi")
+    var message             by mutableStateOf("")
+    var imageURL             by mutableStateOf("")
+    var location             by mutableStateOf(GeoPosition())
+    var gps by mutableStateOf(Gps())
     var me         by  mutableStateOf("Elena")
     var greeting         by  mutableStateOf("The world needs more love")
 
+    var loc = false
     var currentScreen by mutableStateOf(AvailableScreen.OVERVIEW)
     val imagePic   = loadImage(R.drawable.character)
 
@@ -44,6 +46,15 @@ class ThatsAppModel(private val context: ComponentActivity) {
     val phrases = mutableStateListOf<String>()
     private val modelScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    var currentPerson = People("", "", "", null)
+
+    var uploadInProgress   by mutableStateOf(false)
+
+    var downloadedImg     by mutableStateOf<Bitmap?>(null)
+    var downloadInProgress by mutableStateOf(false)
+    var downloadMessage    by mutableStateOf("")
+
+
     fun nextPhrase() {
         modelScope.launch {
             phrases.add(Fact.generateMsg())
@@ -51,33 +62,88 @@ class ThatsAppModel(private val context: ComponentActivity) {
     }
 
     fun handlePeople(){
-        chatList.add(People("Leo",message, loadImage(R.drawable.leo)))
-        chatList.add(People("Milena", message, loadImage(R.drawable.milena)))
-        chatList.add(People("Martin", message, loadImage(R.drawable.martin)))
-        chatList.add(People("Lea", message, loadImage(R.drawable.lea)))
+        chatList.add(People("Lio",message, mainTopic + "/Lio",loadImage(R.drawable.leo)))
+        chatList.add(People("Milena", message, mainTopic + "/Milena",loadImage(R.drawable.milena)))
+        chatList.add(People("Martin", message, mainTopic + "/Martin",loadImage(R.drawable.martin)))
+        chatList.add(People("Lea", message, mainTopic + "/Lea",loadImage(R.drawable.lea)))
 
     }
 
     fun connectAndSubscribe(){
-        mqttConnector.connectAndSubscribe(
-            topic        = mainTopic,
-            onNewMessage = { allFlaps.add(Flap(it))
-                playSound()
-            },
-            onError      = {_, p ->
-                notificationMessage = p
-                playSound()
-            }
+            mqttConnector.connectAndSubscribe(
+                topic = mainTopic +"/" + me,
+                onNewMessage = {
+                    checkMsg(Flap(it))
+                    allFlaps.add(Flap(it))
+                    playSound()
+                },
+                onError = { _, p ->
+                    notificationMessage = p
+                    playSound()
+                }
+            )
+        }
+
+    fun publish(name: String){
+        if (loc){
+            message = ""
+            loc = false
+        }
+        mqttConnector.publish(
+            topic       = mainTopic + "/" + name,
+            message     = Flap(sender  = me, receiver = name,
+                message = message, imageUrl = imageURL, gps =  gps)
         )
+        allFlaps.add(Flap(sender = me, receiver = name, message = message, imageUrl = imageURL, gps = gps))
     }
 
-    fun publish(){
-        mqttConnector.publish(
-            topic       = mainTopic,
-            message     = Flap(sender  = me,
-                message = message))
-        allFlaps.add(Flap(sender = me, message = message))
+    fun uploadToFileIO(bitmap: Bitmap) {
+        uploadInProgress = true
+        //fileioURL = null
+        modelScope.launch {
+            uploadBitmapToFileIO(bitmap    = bitmap,
+                onSuccess = { imageURL = it},
+                onError   = {_, _ -> })  //todo: was machen wir denn nun?
+            uploadInProgress = false
+        }
     }
+
+//allFlaps.add(Flap(it)) bi success
+    fun downloadFromFileIO(flap: Flap){
+        if(flap.imageUrl != null){
+            downloadedImg = null
+            downloadInProgress = true
+            modelScope.launch {
+                downloadBitmapFromFileIO(url       = flap.imageUrl!!,
+                    onSuccess = { downloadedImg = it },
+                    onDeleted = { downloadMessage = "File is deleted"},
+                    onError   = { downloadMessage = "Connection failed"})
+                downloadInProgress = false
+            }
+        }
+    }
+
+    //private fun loadImage(@DrawableRes id: Int) = BitmapFactory.decodeResource(activity.resources, id)
+
+    private fun checkMsg(flap: Flap){
+        if (flap.imageUrl != ""){
+            downloadFromFileIO(flap)
+        }
+        if (flap.gps.latitude != "" && flap.gps.longitude != ""){
+            location = gpsToGeo(flap.gps)
+        }
+    }
+
+    fun geoToGps(geoPosition: GeoPosition): Gps {
+        return Gps(geoPosition.longitude.toString(), geoPosition.latitude.toString())
+    }
+
+    fun gpsToGeo(gps: Gps): GeoPosition {
+        return GeoPosition(gps.longitude.toDouble(), gps.latitude.toDouble())
+    }
+
+    fun messagesWithCurrentPerson(name: String): List<Flap> =
+        allFlaps.filter { it.sender == name || it.receiver == name }
 
     private fun playSound(){
         soundPlayer.seekTo(0)

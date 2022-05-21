@@ -55,7 +55,6 @@ class MqttConnector (mqttBroker: String,
             .noLocal(true)
             .callback {
                 try {
-              // goht nie do inne
                     onNewMessage(it.payloadAsJSONObject())
                 }
                 catch (e: Exception){

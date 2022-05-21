@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import fhnw.emoba.modules.module07.flutter_solution.ui.theme.*
 import fhnw.emoba.thatsapp.model.AvailableScreen
+import fhnw.emoba.thatsapp.model.GpsModel
 import fhnw.emoba.thatsapp.model.PhotoBoothModel
 import fhnw.emoba.thatsapp.model.ThatsAppModel
 import fhnw.emoba.thatsapp.ui.screens.OverviewChat
@@ -15,22 +16,22 @@ import fhnw.emoba.thatsapp.ui.screens.Roboto
 
 
 @Composable
-fun AppUI(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel) {
+fun AppUI(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel, gpsModel: GpsModel) {
     val scaffoldState = rememberScaffoldState()
     MaterialTheme(colors = lightColors(primary = lightBlue100)) {
         Scaffold(scaffoldState = scaffoldState,
-            content = { Body(model, modelPhotoBoothModel) }
+            content = { Body(model, modelPhotoBoothModel, gpsModel) }
         )
     }
 }
 
 @Composable
-private fun Body(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel) {
+private fun Body(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel, gpsModel: GpsModel) {
        Column(modifier = Modifier.fillMaxWidth()) {
            Crossfade(targetState = model.currentScreen) { screen ->
                when (screen){
                     AvailableScreen.CHAT -> {
-                        Chat(model = model, modelPhotoBoothModel = modelPhotoBoothModel)
+                        Chat(model = model, modelPhotoBoothModel = modelPhotoBoothModel, gpsModel = gpsModel)
                     }
                    AvailableScreen.OVERVIEW -> {
                         OverviewChat(model = model)

@@ -90,11 +90,12 @@ fun Overview(it: People, model: ThatsAppModel) {
             .fillMaxWidth(),
             onClick = {
                 title = it.name
+                currentPerson = it
                 currentScreen = AvailableScreen.CHAT
             }) {
             Row(verticalAlignment = Alignment.CenterVertically) {
 
-                ImageProfil(it.loadImage)
+                ImageProfil(it.loadImage!!)
                 Column(modifier = Modifier.fillMaxWidth()) {
                     ListItem(text = {
                         Text(
