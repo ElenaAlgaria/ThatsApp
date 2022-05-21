@@ -55,6 +55,7 @@ class ThatsAppModel(private val context: ComponentActivity) {
     var downloadMessage    by mutableStateOf("")
 
 
+
     fun nextPhrase() {
         modelScope.launch {
             phrases.add(Fact.generateMsg())
@@ -92,18 +93,20 @@ class ThatsAppModel(private val context: ComponentActivity) {
         mqttConnector.publish(
             topic       = mainTopic + "/" + name,
             message     = Flap(sender  = me, receiver = name,
-                message = message, imageUrl = imageURL, gps =  gps)
+                message = message, imageUrl = imageURL, gps =  gps),
         )
         allFlaps.add(Flap(sender = me, receiver = name, message = message, imageUrl = imageURL, gps = gps))
+        gps = Gps()
     }
 
     fun uploadToFileIO(bitmap: Bitmap) {
         uploadInProgress = true
-        //fileioURL = null
         modelScope.launch {
             uploadBitmapToFileIO(bitmap    = bitmap,
-                onSuccess = { imageURL = it},
-                onError   = {_, _ -> })  //todo: was machen wir denn nun?
+                onSuccess = { imageURL = it
+                    println(imageURL)
+                             publish(currentPerson.name)},
+                onError   = {_, _ -> println("Error image url") })
             uploadInProgress = false
         }
     }
@@ -111,11 +114,10 @@ class ThatsAppModel(private val context: ComponentActivity) {
 //allFlaps.add(Flap(it)) bi success
     fun downloadFromFileIO(flap: Flap){
         if(flap.imageUrl != null){
-            downloadedImg = null
             downloadInProgress = true
             modelScope.launch {
                 downloadBitmapFromFileIO(url       = flap.imageUrl!!,
-                    onSuccess = { downloadedImg = it },
+                    onSuccess = { downloadedImg = it},
                     onDeleted = { downloadMessage = "File is deleted"},
                     onError   = { downloadMessage = "Connection failed"})
                 downloadInProgress = false

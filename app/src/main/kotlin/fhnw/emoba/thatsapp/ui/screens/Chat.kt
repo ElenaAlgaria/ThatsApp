@@ -84,23 +84,12 @@ private fun NotificationHost(state: SnackbarHostState) {
 private fun Body(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel, gpsModel: GpsModel) {
     with(model) {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-            val (selfie, topicInfo, allFlapsPanel, message) = createRefs()
-
-            if (modelPhotoBoothModel.photo != null) {
-                Photo(bitmap = modelPhotoBoothModel.photo!!,
-                    model = modelPhotoBoothModel,
-                    modifier = Modifier.constrainAs(selfie) {
-                        top.linkTo(parent.top, 10.dp)
-                        start.linkTo(parent.start, 10.dp)
-                        end.linkTo(parent.end, 10.dp)
-                        width = Dimension.fillToConstraints
-                    })
-            }
+            val (topicInfo, allFlapsPanel, message) = createRefs()
 
             Info("", Modifier.constrainAs(topicInfo) {})
 
             AllFlapsPanel(
-                messagesWithCurrentPerson(currentPerson.name),
+                messagesWithCurrentPerson(currentPerson.name), modelPhotoBoothModel, model,
                 Modifier.constrainAs(allFlapsPanel) {
                     width = Dimension.fillToConstraints
                     height = Dimension.fillToConstraints
@@ -111,7 +100,6 @@ private fun Body(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel, gp
                 })
 
             NewMessage(model, modelPhotoBoothModel, gpsModel, Modifier.constrainAs(message) {
-                //  width = Dimension.fillToConstraints
                 start.linkTo(parent.start, 10.dp)
                 end.linkTo(parent.end, 5.dp)
                 bottom.linkTo(parent.bottom, 20.dp)
@@ -121,7 +109,7 @@ private fun Body(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel, gp
 }
 
 @Composable
-private fun AllFlapsPanel(flaps: List<Flap>, modifier: Modifier) {
+private fun AllFlapsPanel(flaps: List<Flap>, modelPhotoBooth: PhotoBoothModel,model: ThatsAppModel,modifier: Modifier) {
     Box(
         modifier.border(
             width = 1.dp,
@@ -130,16 +118,16 @@ private fun AllFlapsPanel(flaps: List<Flap>, modifier: Modifier) {
         )
     ) {
 
-        AllFlaps(flaps)
+        AllFlaps(flaps, modelPhotoBooth, model)
     }
 }
 
 
 @Composable
-private fun AllFlaps(flaps: List<Flap>) {
+private fun AllFlaps(flaps: List<Flap>, modelPhotoBooth: PhotoBoothModel, model: ThatsAppModel) {
     val scrollState = rememberLazyListState()
     LazyColumn(state = scrollState) {
-        items(flaps) { SingleFlap(it) }
+        items(flaps) { SingleFlap(it, modelPhotoBooth, model) }
     }
 
     LaunchedEffect(flaps.size) {
@@ -149,14 +137,29 @@ private fun AllFlaps(flaps: List<Flap>) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun SingleFlap(flap: Flap) {
+private fun SingleFlap(flap: Flap, modelPhotoBooth: PhotoBoothModel, model: ThatsAppModel) {
     with(flap) {
         if (message != "") {
             ListItem(text = { Text(message) },
                 overlineText = { Text(sender) }
             )
-        } else {
-            ListItem(text = { Text(gps.longitude + " " + gps.latitude) },
+        } else if (modelPhotoBooth.photo != null){
+            ListItem(text = {Image(bitmap = modelPhotoBooth.photo!!.asImageBitmap(),
+                contentDescription = ""
+            ) },
+                overlineText = { Text(sender) }
+            )
+        } else if (model.downloadedImg != null){
+            println("braaa")
+            ListItem(text = {Image(bitmap = model.downloadedImg!!.asImageBitmap(),
+                contentDescription = ""
+            ) },
+                overlineText = { Text(sender) }
+            )
+        }
+
+        else {
+            ListItem(text = { Text(gps.longitude + "  " + gps.latitude) },
                 overlineText = { Text(sender) }
             )
         }
@@ -171,16 +174,6 @@ private fun Info(text: String, modifier: Modifier) {
         style = MaterialTheme.typography.h6,
         modifier = modifier
     )
-}
-
-@Composable
-private fun Photo(bitmap: Bitmap, model: PhotoBoothModel, modifier: Modifier) {
-    with(model) {
-        Image(bitmap = bitmap.asImageBitmap(),
-            contentDescription = "",
-            modifier = modifier.clickable(onClick = { rotatePhoto() })
-        )
-    }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -202,7 +195,7 @@ private fun NewMessage(
                 shape = RoundedCornerShape(20.dp), textStyle = TextStyle(fontSize = 14.sp)
 
             )
-            IconButton(onClick = { modelPhotoBoothModel.takePhoto() }) {
+            IconButton(onClick = { modelPhotoBoothModel.takePhoto(model)}) {
                 Icon(Icons.Filled.CameraAlt, contentDescription = "pic")
 
             }

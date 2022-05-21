@@ -12,24 +12,21 @@ import androidx.compose.runtime.setValue
 import fhnw.emoba.thatsapp.data.CameraAppConnector
 
 class PhotoBoothModel(private val cameraAppConnector: CameraAppConnector) {
-    private val modelScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
 
     var photo by mutableStateOf<Bitmap?>(null)
 
     var notificationMessage by mutableStateOf("")
 
-    fun takePhoto() {
-        cameraAppConnector.getBitmap(onSuccess  = { photo = it },
-                                     onCanceled = { notificationMessage = "Kein neues Bild" })
+    fun takePhoto(model: ThatsAppModel) {
+        cameraAppConnector.getBitmap(onSuccess  = { photo = it
+                                                   model.uploadToFileIO(photo!!)},
+                                     onCanceled = { notificationMessage = "Kein neues Bild"})
     }
 
     fun rotatePhoto() {
         photo?.let {
-       //     modelScope.launch {
                 photo = photo!!.rotate(90f)
             }
-        //}
     }
 }
 
