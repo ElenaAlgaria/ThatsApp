@@ -118,7 +118,7 @@ fun Overview(it: People, model: ThatsAppModel) {
 }
 
 @Composable
-private fun ImageProfil(image: ImageBitmap) {
+fun ImageProfil(image: ImageBitmap) {
     Image(
         bitmap = image,
         contentDescription = "",

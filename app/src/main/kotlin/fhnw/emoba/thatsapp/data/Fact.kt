@@ -9,7 +9,7 @@ object Fact {
 
     private val aus = "Australia is wider than the moon. The moon sits at 3400km in diameter, while Australia’s diameter from east to west is almost 4000km."
 
-    private val mel = "'Mellifluous' is a sound that is pleasingly smooth and musical to hear."
+    private val mel = "Mellifluous' is a sound that is pleasingly smooth and musical to hear."
 
     private val tee = "Human teeth are the only part of the body that cannot heal themselves. Teeth are coated in enamel which is not a living tissue.\n"
 

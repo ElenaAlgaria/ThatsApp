@@ -1,6 +1,7 @@
 package fhnw.emoba.thatsapp.ui
 
 import android.graphics.Bitmap
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -37,6 +39,7 @@ import fhnw.emoba.thatsapp.model.AvailableScreen
 import fhnw.emoba.thatsapp.model.GpsModel
 import fhnw.emoba.thatsapp.model.PhotoBoothModel
 import fhnw.emoba.thatsapp.model.ThatsAppModel
+import fhnw.emoba.thatsapp.ui.screens.ImageProfil
 
 
 @Composable
@@ -56,7 +59,19 @@ fun Chat(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel, gpsModel: 
 private fun Bar(model: ThatsAppModel) {
     with(model) {
         TopAppBar(
-            title = { Text(title) },
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(title)
+                    Image(
+                        currentPerson.loadImage!!, "profilPic",
+                        alignment = Alignment.CenterEnd,
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .fillMaxWidth()
+                            .padding(5.dp)
+                    )
+                }
+            },
             navigationIcon = {
                 IconButton(onClick = { currentScreen = AvailableScreen.OVERVIEW }) {
                     Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
@@ -93,7 +108,7 @@ private fun Body(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel, gp
                 Modifier.constrainAs(allFlapsPanel) {
                     width = Dimension.fillToConstraints
                     height = Dimension.fillToConstraints
-                    top.linkTo(topicInfo.bottom, 15.dp)
+                    top.linkTo(topicInfo.bottom, 5.dp)
                     start.linkTo(parent.start, 10.dp)
                     end.linkTo(parent.end, 10.dp)
                     bottom.linkTo(message.top, 15.dp)
@@ -109,14 +124,17 @@ private fun Body(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel, gp
 }
 
 @Composable
-private fun AllFlapsPanel(flaps: List<Flap>, modelPhotoBooth: PhotoBoothModel,model: ThatsAppModel,modifier: Modifier) {
+private fun AllFlapsPanel(
+    flaps: List<Flap>,
+    modelPhotoBooth: PhotoBoothModel,
+    model: ThatsAppModel,
+    modifier: Modifier
+) {
     Box(
-        modifier.border(
-            width = 1.dp,
-            brush = SolidColor(gray300),
-            shape = RectangleShape
-        )
-    ) {
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    )
+    {
 
         AllFlaps(flaps, modelPhotoBooth, model)
     }
@@ -139,32 +157,70 @@ private fun AllFlaps(flaps: List<Flap>, modelPhotoBooth: PhotoBoothModel, model:
 @Composable
 private fun SingleFlap(flap: Flap, modelPhotoBooth: PhotoBoothModel, model: ThatsAppModel) {
     with(flap) {
-        if (message != "") {
-            ListItem(text = { Text(message) },
-                overlineText = { Text(sender) }
-            )
-        } else if (modelPhotoBooth.photo != null){
-            ListItem(text = {Image(bitmap = modelPhotoBooth.photo!!.asImageBitmap(),
-                contentDescription = ""
-            ) },
-                overlineText = { Text(sender) }
-            )
-        } else if (model.downloadedImg != null){
-            println("braaa")
-            ListItem(text = {Image(bitmap = model.downloadedImg!!.asImageBitmap(),
-                contentDescription = ""
-            ) },
-                overlineText = { Text(sender) }
-            )
-        }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 25.dp, vertical = 4.dp),
+            horizontalAlignment = if (flap.sender == "Elena") {
+                Alignment.End
+            } else {
+                Alignment.Start
+            }
 
-        else {
-            ListItem(text = { Text(gps.longitude + "  " + gps.latitude) },
-                overlineText = { Text(sender) }
-            )
+        ) {
+            if (message != "") {
+                Card(
+                    modifier = Modifier.widthIn(max = 340.dp), shape = RoundedCornerShape(16.dp),
+                    backgroundColor = when {
+                        flap.sender == "Elena" -> MaterialTheme.colors.primary
+                        else -> MaterialTheme.colors.secondary}
+                ) {
+                    Text(
+                        modifier = Modifier.padding(10.dp),
+                        color = MaterialTheme.colors.onSecondary,
+                        text = message
+                    )
+                }
+
+            } else if (modelPhotoBooth.photo != null) {
+                println("ele")
+                ListItem(text = {
+                    Image(
+                        bitmap = modelPhotoBooth.photo!!.asImageBitmap(),
+                        contentDescription = ""
+                    )
+                }
+                )
+            } else if (model.downloadedImg != null) {
+                println("lio")
+                ListItem(text = {
+                    Image(
+                        bitmap = model.downloadedImg!!.asImageBitmap(),
+                        contentDescription = ""
+                    )
+                }
+                )
+            } else {
+                Card(
+                    modifier = Modifier.widthIn(max = 340.dp), shape = RoundedCornerShape(16.dp),
+                    backgroundColor = when {
+                        flap.sender == "Elena" -> MaterialTheme.colors.primary
+                        else -> MaterialTheme.colors.secondary}
+                ) {
+                    Text(
+                        modifier = Modifier.padding(10.dp),
+                        color = MaterialTheme.colors.onSecondary,
+                        text = gps.longitude + "  " + gps.latitude
+                    )
+                }
+            }
+                Text(
+                    text = sender,
+                    fontSize = 12.sp,
+                )
         }
-        Divider()
     }
+
 }
 
 @Composable
@@ -180,7 +236,7 @@ private fun Info(text: String, modifier: Modifier) {
 @Composable
 private fun NewMessage(
     model: ThatsAppModel,
-    modelPhotoBoothModel: PhotoBoothModel,
+    modelPhotoBooth: PhotoBoothModel,
     gpsModel: GpsModel,
     modifier: Modifier
 ) {
@@ -192,10 +248,12 @@ private fun NewMessage(
                 onValueChange = { message = it },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { keyboard?.hide() }),
-                shape = RoundedCornerShape(20.dp), textStyle = TextStyle(fontSize = 14.sp)
+                shape = RoundedCornerShape(20.dp), textStyle = TextStyle(fontSize = 14.sp),
+                modifier = modifier.widthIn(250.dp, 250.dp)
 
             )
-            IconButton(onClick = { modelPhotoBoothModel.takePhoto(model)}) {
+            IconButton(onClick = {modelPhotoBooth.takePhoto(model)
+            }) {
                 Icon(Icons.Filled.CameraAlt, contentDescription = "pic")
 
             }

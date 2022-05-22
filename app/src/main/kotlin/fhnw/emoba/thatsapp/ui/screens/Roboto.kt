@@ -73,11 +73,11 @@ private fun Body(model: ThatsAppModel) {
                 width = Dimension.fillToConstraints
             })
             if (visible){
-            Msg("Hello, its me Roboto! How are you? \n  I hope you are fine :) I'm here to entertain you with \n some interesting facts." +
-                    "I hope you will have some fun here.", Modifier.constrainAs(greeting){
+            Msg("Hello, its me Roboto! How are you? I hope you are fine :) I'm here to entertain you with some interesting facts ;)", Modifier.constrainAs(greeting){
                 top.linkTo(pic.bottom, 10.dp)
-                end.linkTo(parent.end, margin)
                 start.linkTo(parent.start, margin)
+                end.linkTo(parent.end, margin)
+                width = Dimension.fillToConstraints
             })
 
                 Button(onClick = { visible = ! visible }, Modifier.constrainAs(btn) {
@@ -127,6 +127,7 @@ private fun PhrasesBox(phrases: List<String>, modifier: Modifier){
         val scrollState = rememberLazyListState()
         LazyColumn(
             state = scrollState,
+            modifier = Modifier.align(Alignment.TopCenter)
 
             ) {
             items(phrases) { SinglePhrase(it) }
@@ -139,11 +140,11 @@ private fun PhrasesBox(phrases: List<String>, modifier: Modifier){
 
 @Composable
 private fun SinglePhrase(phrase: String){
-    Box(modifier = Modifier.height(280.dp)
+    Box(modifier = Modifier.height(phrase.length.dp + 30.dp)
         .padding(vertical = 30.dp, horizontal = 40.dp)){
-        Text(phrase, Modifier.align(Alignment.CenterStart))
+        Text(phrase, Modifier.align(Alignment.TopCenter))
     }
-    Divider()
+   Divider()
 }
 
 
