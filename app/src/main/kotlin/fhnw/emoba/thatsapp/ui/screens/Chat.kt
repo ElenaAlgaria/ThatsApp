@@ -176,7 +176,6 @@ private fun SingleFlap(flap: Flap, model: ThatsAppModel, gpsModel: GpsModel) {
                         else -> MaterialTheme.colors.secondary
                     }
                 ) {
-                        println("whups")
                     Text(
                         modifier = Modifier.padding(10.dp),
                         color = MaterialTheme.colors.onSecondary,

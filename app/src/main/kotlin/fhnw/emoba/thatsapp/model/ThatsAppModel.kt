@@ -4,6 +4,10 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.activity.ComponentActivity
 import androidx.annotation.DrawableRes
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -87,6 +91,11 @@ class ThatsAppModel(private val context: ComponentActivity) {
         )
         if (imageURL != "") {
             flap.imageBitmap = img
+            currentPerson.text = "\uD83D\uDCF8" + " " + "Photo"
+        }
+
+        if (gps.longitude != ""){
+            currentPerson.text = "\uD83D\uDCCDLocation"
         }
 
         mqttConnector.publish(

@@ -73,7 +73,7 @@ private fun Body(model: ThatsAppModel) {
                 width = Dimension.fillToConstraints
             })
             if (visible){
-            Msg("Hello, its me Roboto! How are you? I hope you are fine :) I'm here to entertain you with some interesting facts ;)", Modifier.constrainAs(greeting){
+            Msg( Modifier.constrainAs(greeting){
                 top.linkTo(pic.bottom, 10.dp)
                 start.linkTo(parent.start, margin)
                 end.linkTo(parent.end, margin)
@@ -118,16 +118,13 @@ private fun Body(model: ThatsAppModel) {
 @Composable
 private fun PhrasesBox(phrases: List<String>, modifier: Modifier){
     Box(
-        modifier.border(
-            width = 1.dp,
-            brush = SolidColor(gray300),
-            shape = RectangleShape
-        )
+        modifier = modifier,
+        contentAlignment = Alignment.Center
     ) {
         val scrollState = rememberLazyListState()
         LazyColumn(
             state = scrollState,
-            modifier = Modifier.align(Alignment.TopCenter)
+           // modifier = Modifier.align(Alignment.TopCenter)
 
             ) {
             items(phrases) { SinglePhrase(it) }
@@ -140,20 +137,51 @@ private fun PhrasesBox(phrases: List<String>, modifier: Modifier){
 
 @Composable
 private fun SinglePhrase(phrase: String){
-    Box(modifier = Modifier.height(phrase.length.dp + 30.dp)
+    Column( modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 25.dp, vertical = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+        Card(
+            modifier = Modifier.widthIn(max = 340.dp), shape = RoundedCornerShape(16.dp),
+            backgroundColor = MaterialTheme.colors.secondary
+        ) {
+
+            Text(text     = phrase,
+                style    = MaterialTheme.typography.body1,
+                modifier = Modifier.padding(10.dp),
+                color = MaterialTheme.colors.onSecondary
+            )
+        }
+    }
+    
+    
+    /*
+    Box(modifier = Modifier
+        .height(phrase.length.dp + 30.dp)
         .padding(vertical = 30.dp, horizontal = 40.dp)){
         Text(phrase, Modifier.align(Alignment.TopCenter))
     }
    Divider()
+
+     */
+
 }
 
 
 @Composable
-private fun Msg(text: String, modifier: Modifier){
-    Text(text     = text,
+private fun Msg( modifier: Modifier){
+    Card(
+        modifier = modifier, shape = RoundedCornerShape(16.dp),
+        backgroundColor = MaterialTheme.colors.secondary
+    ) {
+
+    Text(text     = "Hello, its me Roboto! How are you? I hope you are fine :) I'm here to entertain you with some interesting facts ;)",
         style    = MaterialTheme.typography.body1,
-        modifier = modifier
+        modifier = modifier.padding(10.dp),
+        color = MaterialTheme.colors.onSecondary
     )
+    }
+
 }
 
 @Composable
