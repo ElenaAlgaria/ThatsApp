@@ -14,10 +14,21 @@ class PhotoBoothModel(private val cameraAppConnector: CameraAppConnector) {
 
     fun takePhoto(model: ThatsAppModel, name: String) {
         cameraAppConnector.getBitmap(onSuccess  = {
-                                                   model.uploadToFileIO(it,name)
+                                                   model.uploadToFileIO(rotatePhoto(it),name)
                                                   },
                                      onCanceled = { notificationMessage = "Kein neues Bild"})
     }
+
+    fun rotatePhoto(img: Bitmap):Bitmap {
+          return  img.rotate(90f)
+    }
+}
+
+private fun Bitmap.rotate(degrees: Float) : Bitmap {
+    val matrix = Matrix().apply {
+        postRotate(degrees)
+    }
+    return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
 
 }
 

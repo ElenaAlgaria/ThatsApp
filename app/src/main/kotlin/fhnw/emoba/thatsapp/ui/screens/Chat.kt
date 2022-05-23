@@ -103,7 +103,7 @@ private fun Body(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel, gp
             Info("", Modifier.constrainAs(topicInfo) {})
 
             AllFlapsPanel(
-                messagesWithCurrentPerson(currentPerson.name), model, gpsModel,
+                messagesWithCurrentPerson(currentPerson.name), model, gpsModel,modelPhotoBoothModel,
                 Modifier.constrainAs(allFlapsPanel) {
                     width = Dimension.fillToConstraints
                     height = Dimension.fillToConstraints
@@ -128,6 +128,7 @@ private fun AllFlapsPanel(
     flaps: List<Flap>,
     model: ThatsAppModel,
     gpsModel: GpsModel,
+    photoBoothModel: PhotoBoothModel,
     modifier: Modifier
 ) {
     Box(
@@ -136,16 +137,16 @@ private fun AllFlapsPanel(
     )
     {
 
-        AllFlaps(flaps, model, gpsModel)
+        AllFlaps(flaps, model, gpsModel, photoBoothModel)
     }
 }
 
 
 @Composable
-private fun AllFlaps(flaps: List<Flap>, model: ThatsAppModel, gpsModel: GpsModel) {
+private fun AllFlaps(flaps: List<Flap>, model: ThatsAppModel, gpsModel: GpsModel, photoBoothModel: PhotoBoothModel) {
     val scrollState = rememberLazyListState()
     LazyColumn(state = scrollState) {
-        items(flaps) { SingleFlap(it, model, gpsModel) }
+        items(flaps) { SingleFlap(it, model, gpsModel, photoBoothModel) }
     }
 
     LaunchedEffect(flaps.size) {
@@ -155,7 +156,7 @@ private fun AllFlaps(flaps: List<Flap>, model: ThatsAppModel, gpsModel: GpsModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun SingleFlap(flap: Flap, model: ThatsAppModel, gpsModel: GpsModel) {
+private fun SingleFlap(flap: Flap, model: ThatsAppModel, gpsModel: GpsModel, photoBoothModel: PhotoBoothModel) {
     with(flap) {
         Column(
             modifier = Modifier
@@ -186,7 +187,8 @@ private fun SingleFlap(flap: Flap, model: ThatsAppModel, gpsModel: GpsModel) {
                 ListItem(text = {
                     Image(
                         bitmap = flap.imageBitmap.asImageBitmap(),
-                        contentDescription = ""
+                        contentDescription = "",
+                        modifier = Modifier.size(400.dp, 400.dp)
                     )
                 }
                 )
@@ -203,7 +205,7 @@ private fun SingleFlap(flap: Flap, model: ThatsAppModel, gpsModel: GpsModel) {
                         modifier = Modifier.padding(10.dp).clickable {
                             gpsModel.showOnMap(model.gpsToGeo(gps)) },
                         color = MaterialTheme.colors.onSecondary,
-                        text = gps.longitude + "  " + gps.latitude
+                        text = gps.longitude + "  " + gps.latitude + "\uD83D\uDCCD"
                     )
 
                 }
