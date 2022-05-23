@@ -11,16 +11,15 @@
 
 === Herausstellungsmerkmal meiner App
 
-* _Beschreibung der einen, besonderen Eigenschaft der App_
 Unten rechts auf dem Screen mit allen Chats befindet sich ein Button. Klickt man ihn gelangt man zur Roboto page. Er stellt sich vor. Wenn man auf "Let's go" klickt, geht diese Nachricht weg und eine neue leere Box erscheint. Klickt man dann auf "More" werden random Fakten angezeigt. Man kann sich dann durch die Liste durchscrollen und sie lesen oder einfach wieder zur Chatliste zurückkehren.
 
 === Getting Started
 
 _Kurze Beschreibung welche initialen Schritte notwendig sind, um eine Nachricht an einen Chat-Teilnehmer verschicken zu können._
- val mqttBroker = "broker.hivemq.com"
- val mainTopic = "fhnw/emoba/thatsapp" -> /Name also zum Beispiel /Elena
- 
- Meine App + Meine App => Auf dem einem Handy oben rechts auf Profil klicken und den Namen ändern zum Beispiel Lea. Dann in den Elena Chat und auf dem anderen Handy auf den Lea Chat. 
+
+* val mqttBroker = "broker.hivemq.com"
+* val mainTopic = "fhnw/emoba/thatsapp" -> /Name also zum Beispiel fhnw/emoba/thatsapp/Elena
+* Meine App + Meine App => Auf dem einem Handy oben rechts auf Profil klicken und den Namen   ändern zum Beispiel Lea. Dann in den Elena Chat und auf dem anderen Handy auf den Lea Chat. 
 
 
 === Abgabe
