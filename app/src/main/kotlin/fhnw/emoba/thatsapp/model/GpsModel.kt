@@ -18,7 +18,7 @@ class GpsModel(private val activity: ComponentActivity,
             locator.getLocation(onNewLocation      = { waypoints = it
                                                      thatsAppModel.gps = thatsAppModel.geoToGps(it)
                                                      },
-                                onFailure          = {}, //todo: was machen wir?
+                                onFailure          = {},
                                 onPermissionDenied = { notificationMessage = "Keine Berechtigung." },
             )
         return thatsAppModel.gps.longitude + " " + thatsAppModel.gps.latitude

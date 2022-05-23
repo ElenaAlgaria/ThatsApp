@@ -1,15 +1,22 @@
 package fhnw.emoba.thatsapp.data
 
+import android.graphics.Bitmap
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.ImageBitmap
 import org.json.JSONObject
 import fhnw.emoba.modules.module07.flutter_solution.data.Message
 
-data class Flap(val sender: String,
-                val receiver: String,
-                val message: String,
-                val imageUrl: String,
+data class Flap(val sender: String = "",
+                val receiver: String = "",
+                val message: String = "",
+                var imageUrl: String = "",
                 val gps: Gps
 ) : Message {
+    var imageBitmap by mutableStateOf(Bitmap.createBitmap(120,120, Bitmap.Config.ALPHA_8))
 
+// ned in constructor eif süscht en bitmap inneture und de luege nachem string ?
     constructor(json : JSONObject): this(json.getString("sender"),
                                          json.getString("receiver"),
                                          json.getString("message"),

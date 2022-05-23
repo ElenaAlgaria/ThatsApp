@@ -1,10 +1,6 @@
 package fhnw.emoba.thatsapp.ui
 
-import android.graphics.Bitmap
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,8 +19,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
@@ -39,7 +34,6 @@ import fhnw.emoba.thatsapp.model.AvailableScreen
 import fhnw.emoba.thatsapp.model.GpsModel
 import fhnw.emoba.thatsapp.model.PhotoBoothModel
 import fhnw.emoba.thatsapp.model.ThatsAppModel
-import fhnw.emoba.thatsapp.ui.screens.ImageProfil
 
 
 @Composable
@@ -104,7 +98,7 @@ private fun Body(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel, gp
             Info("", Modifier.constrainAs(topicInfo) {})
 
             AllFlapsPanel(
-                messagesWithCurrentPerson(currentPerson.name), modelPhotoBoothModel, model,
+                messagesWithCurrentPerson(currentPerson.name), model,
                 Modifier.constrainAs(allFlapsPanel) {
                     width = Dimension.fillToConstraints
                     height = Dimension.fillToConstraints
@@ -126,7 +120,6 @@ private fun Body(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel, gp
 @Composable
 private fun AllFlapsPanel(
     flaps: List<Flap>,
-    modelPhotoBooth: PhotoBoothModel,
     model: ThatsAppModel,
     modifier: Modifier
 ) {
@@ -136,16 +129,16 @@ private fun AllFlapsPanel(
     )
     {
 
-        AllFlaps(flaps, modelPhotoBooth, model)
+        AllFlaps(flaps, model)
     }
 }
 
 
 @Composable
-private fun AllFlaps(flaps: List<Flap>, modelPhotoBooth: PhotoBoothModel, model: ThatsAppModel) {
+private fun AllFlaps(flaps: List<Flap>, model: ThatsAppModel) {
     val scrollState = rememberLazyListState()
     LazyColumn(state = scrollState) {
-        items(flaps) { SingleFlap(it, modelPhotoBooth, model) }
+        items(flaps) { SingleFlap(it,model) }
     }
 
     LaunchedEffect(flaps.size) {
@@ -155,7 +148,7 @@ private fun AllFlaps(flaps: List<Flap>, modelPhotoBooth: PhotoBoothModel, model:
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun SingleFlap(flap: Flap, modelPhotoBooth: PhotoBoothModel, model: ThatsAppModel) {
+private fun SingleFlap(flap: Flap, model: ThatsAppModel) {
     with(flap) {
         Column(
             modifier = Modifier
@@ -181,21 +174,10 @@ private fun SingleFlap(flap: Flap, modelPhotoBooth: PhotoBoothModel, model: That
                         text = message
                     )
                 }
-
-            } else if (modelPhotoBooth.photo != null) {
-                println("ele")
+            } else if (imageUrl != "") {
                 ListItem(text = {
                     Image(
-                        bitmap = modelPhotoBooth.photo!!.asImageBitmap(),
-                        contentDescription = ""
-                    )
-                }
-                )
-            } else if (model.downloadedImg != null) {
-                println("lio")
-                ListItem(text = {
-                    Image(
-                        bitmap = model.downloadedImg!!.asImageBitmap(),
+                        bitmap =  flap.imageBitmap.asImageBitmap(),
                         contentDescription = ""
                     )
                 }
@@ -252,7 +234,8 @@ private fun NewMessage(
                 modifier = modifier.widthIn(250.dp, 250.dp)
 
             )
-            IconButton(onClick = {modelPhotoBooth.takePhoto(model)
+            IconButton(onClick = {
+                modelPhotoBooth.takePhoto(model,currentPerson.name)
             }) {
                 Icon(Icons.Filled.CameraAlt, contentDescription = "pic")
 

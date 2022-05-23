@@ -2,7 +2,6 @@ package fhnw.emoba.thatsapp.model
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.media.MediaPlayer
 import androidx.activity.ComponentActivity
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.getValue
@@ -21,22 +20,22 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 class ThatsAppModel(private val context: ComponentActivity) {
-    var title      = ""
+    var title = ""
     val mqttBroker = "broker.hivemq.com"
-    val mainTopic  = "fhnw/emoba/thatsapp"
+    val mainTopic = "fhnw/emoba/thatsapp"
     val allFlaps = mutableStateListOf<Flap>()
 
     var notificationMessage by mutableStateOf("")
-    var message             by mutableStateOf("")
-    var imageURL             by mutableStateOf("")
-    var location             by mutableStateOf(GeoPosition())
+    var message by mutableStateOf("")
+    var imageURL by mutableStateOf("")
+    var location by mutableStateOf(GeoPosition())
     var gps by mutableStateOf(Gps())
-    var me         by  mutableStateOf("Elena")
-    var greeting         by  mutableStateOf("The world needs more love")
+    var me by mutableStateOf("Elena")
+    var greeting by mutableStateOf("The world needs more love")
 
     var loc = false
     var currentScreen by mutableStateOf(AvailableScreen.OVERVIEW)
-    val imagePic   = loadImage(R.drawable.character)
+    val imagePic = loadImage(R.drawable.character)
 
     private val mqttConnector by lazy { MqttConnector(mqttBroker) }
 
@@ -47,12 +46,11 @@ class ThatsAppModel(private val context: ComponentActivity) {
 
     var currentPerson = People("", "", "", null)
 
-    var uploadInProgress   by mutableStateOf(false)
+    var uploadInProgress by mutableStateOf(false)
 
-    var downloadedImg     by mutableStateOf<Bitmap?>(null)
+    var img: Bitmap? = null
     var downloadInProgress by mutableStateOf(false)
-    var downloadMessage    by mutableStateOf("")
-
+    var downloadMessage by mutableStateOf("")
 
 
     fun nextPhrase() {
@@ -61,70 +59,84 @@ class ThatsAppModel(private val context: ComponentActivity) {
         }
     }
 
-    fun handlePeople(){
-        chatList.add(People("Lio",message, mainTopic + "/Lio",loadImage(R.drawable.leo)))
-        chatList.add(People("Milena", message, mainTopic + "/Milena",loadImage(R.drawable.milena)))
-        chatList.add(People("Martin", message, mainTopic + "/Martin",loadImage(R.drawable.martin)))
-        chatList.add(People("Lea", message, mainTopic + "/Lea",loadImage(R.drawable.lea)))
+    fun handlePeople() {
+        chatList.add(People("Lio", message, mainTopic + "/Lio", loadImage(R.drawable.leo)))
+        chatList.add(People("Milena", message, mainTopic + "/Milena", loadImage(R.drawable.milena)))
+        chatList.add(People("Martin", message, mainTopic + "/Martin", loadImage(R.drawable.martin)))
+        chatList.add(People("Lea", message, mainTopic + "/Lea", loadImage(R.drawable.lea)))
 
     }
 
-    fun connectAndSubscribe(){
-            mqttConnector.connectAndSubscribe(
-                topic = mainTopic +"/" + me,
-                onNewMessage = {
-                    checkMsg(Flap(it))
-                    allFlaps.add(Flap(it))
-                },
-                onError = { _, p ->
-                    notificationMessage = p
-                }
-            )
-        }
+    fun connectAndSubscribe() {
+        mqttConnector.connectAndSubscribe(
+            topic = mainTopic + "/" + me,
+            onNewMessage = {
+                val flap = Flap(it)
+                checkMsg(flap)
+                allFlaps.add(flap)
+            },
+            onError = { _, p ->
+                notificationMessage = p
+            }
+        )
+    }
 
-    fun publish(name: String){
+    fun publish(name: String) {
         currentPerson.text = message
-        if (loc){
+        val flap = Flap(
+            sender = me, receiver = name,
+            message = message, imageUrl = imageURL, gps = gps
+        )
+        if (imageURL != ""){
+        flap.imageBitmap = img
+        }
+        if (loc) {
             message = ""
             loc = false
         }
         mqttConnector.publish(
-            topic       = mainTopic + "/" + name,
-            message     = Flap(sender  = me, receiver = name,
-                message = message, imageUrl = imageURL, gps =  gps),
+            topic = mainTopic + "/" + name,
+            message = flap,
         )
-        allFlaps.add(Flap(sender = me, receiver = name, message = message, imageUrl = imageURL, gps = gps))
+        allFlaps.add(flap)
         gps = Gps()
         imageURL = ""
     }
 
-    fun uploadToFileIO(bitmap: Bitmap) {
+    fun uploadToFileIO(bitmap: Bitmap, name: String) {
         uploadInProgress = true
         modelScope.launch {
-            uploadBitmapToFileIO(bitmap    = bitmap,
-                onSuccess = { imageURL = it
-                             publish(currentPerson.name)},
-                onError   = {_, _ -> println("Error image url") })
+            uploadBitmapToFileIO(bitmap = bitmap,
+                onSuccess = {
+                    img = bitmap
+                    imageURL = it
+                    publish(name)
+                },
+                onError = { _, _ -> println("Error image url") })
             uploadInProgress = false
         }
+
     }
 
-    fun downloadFromFileIO(flap: Flap){
-    downloadInProgress = true
-    modelScope.launch {
-        downloadBitmapFromFileIO(url       = flap.imageUrl,
-            onSuccess = { downloadedImg = it},
-            onDeleted = { downloadMessage = "File is deleted"},
-            onError   = { downloadMessage = "Connection failed"})
-        downloadInProgress = false
+    fun downloadFromFileIO(flap: Flap) {
+        downloadInProgress = true
+        modelScope.launch {
+            downloadBitmapFromFileIO(url = flap.imageUrl,
+                onSuccess = {
+                    flap.imageBitmap = it
+                    flap.imageUrl = ""
+                },
+                onDeleted = { downloadMessage = "File is deleted" },
+                onError = { downloadMessage = "Connection failed" })
+            downloadInProgress = false
+        }
     }
-}
 
-    private fun checkMsg(flap: Flap){
-        if (flap.imageUrl != ""){
+    private fun checkMsg(flap: Flap) {
+        if (flap.imageUrl != "") {
             downloadFromFileIO(flap)
         }
-        if (flap.gps.latitude != "" && flap.gps.longitude != ""){
+        if (flap.gps.latitude != "" && flap.gps.longitude != "") {
             location = gpsToGeo(flap.gps)
         }
     }
@@ -140,7 +152,7 @@ class ThatsAppModel(private val context: ComponentActivity) {
     fun messagesWithCurrentPerson(name: String): List<Flap> =
         allFlaps.filter { it.sender == name || it.receiver == name }
 
-    fun loadImage(@DrawableRes id: Int) : ImageBitmap {
+    fun loadImage(@DrawableRes id: Int): ImageBitmap {
         return BitmapFactory.decodeResource(context.resources, id).asImageBitmap()
     }
 }
