@@ -1,12 +1,14 @@
 package fhnw.emoba.thatsapp.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -22,8 +24,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -98,7 +103,7 @@ private fun Body(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel, gp
             Info("", Modifier.constrainAs(topicInfo) {})
 
             AllFlapsPanel(
-                messagesWithCurrentPerson(currentPerson.name), model,
+                messagesWithCurrentPerson(currentPerson.name), model, gpsModel,
                 Modifier.constrainAs(allFlapsPanel) {
                     width = Dimension.fillToConstraints
                     height = Dimension.fillToConstraints
@@ -121,6 +126,7 @@ private fun Body(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel, gp
 private fun AllFlapsPanel(
     flaps: List<Flap>,
     model: ThatsAppModel,
+    gpsModel: GpsModel,
     modifier: Modifier
 ) {
     Box(
@@ -129,16 +135,16 @@ private fun AllFlapsPanel(
     )
     {
 
-        AllFlaps(flaps, model)
+        AllFlaps(flaps, model, gpsModel)
     }
 }
 
 
 @Composable
-private fun AllFlaps(flaps: List<Flap>, model: ThatsAppModel) {
+private fun AllFlaps(flaps: List<Flap>, model: ThatsAppModel, gpsModel: GpsModel) {
     val scrollState = rememberLazyListState()
     LazyColumn(state = scrollState) {
-        items(flaps) { SingleFlap(it,model) }
+        items(flaps) { SingleFlap(it, model, gpsModel) }
     }
 
     LaunchedEffect(flaps.size) {
@@ -148,13 +154,13 @@ private fun AllFlaps(flaps: List<Flap>, model: ThatsAppModel) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun SingleFlap(flap: Flap, model: ThatsAppModel) {
+private fun SingleFlap(flap: Flap, model: ThatsAppModel, gpsModel: GpsModel) {
     with(flap) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 25.dp, vertical = 4.dp),
-            horizontalAlignment = if (flap.sender == "Elena") {
+            horizontalAlignment = if (flap.sender == model.me) {
                 Alignment.End
             } else {
                 Alignment.Start
@@ -165,9 +171,11 @@ private fun SingleFlap(flap: Flap, model: ThatsAppModel) {
                 Card(
                     modifier = Modifier.widthIn(max = 340.dp), shape = RoundedCornerShape(16.dp),
                     backgroundColor = when {
-                        flap.sender == "Elena" -> MaterialTheme.colors.primary
-                        else -> MaterialTheme.colors.secondary}
+                        flap.sender == model.me -> MaterialTheme.colors.primary
+                        else -> MaterialTheme.colors.secondary
+                    }
                 ) {
+                        println("whups")
                     Text(
                         modifier = Modifier.padding(10.dp),
                         color = MaterialTheme.colors.onSecondary,
@@ -177,7 +185,7 @@ private fun SingleFlap(flap: Flap, model: ThatsAppModel) {
             } else if (imageUrl != "") {
                 ListItem(text = {
                     Image(
-                        bitmap =  flap.imageBitmap.asImageBitmap(),
+                        bitmap = flap.imageBitmap.asImageBitmap(),
                         contentDescription = ""
                     )
                 }
@@ -186,20 +194,24 @@ private fun SingleFlap(flap: Flap, model: ThatsAppModel) {
                 Card(
                     modifier = Modifier.widthIn(max = 340.dp), shape = RoundedCornerShape(16.dp),
                     backgroundColor = when {
-                        flap.sender == "Elena" -> MaterialTheme.colors.primary
-                        else -> MaterialTheme.colors.secondary}
+                        flap.sender == model.me -> MaterialTheme.colors.primary
+                        else -> MaterialTheme.colors.secondary
+                    }
                 ) {
+
                     Text(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = Modifier.padding(10.dp).clickable {
+                            gpsModel.showOnMap(model.gpsToGeo(gps)) },
                         color = MaterialTheme.colors.onSecondary,
                         text = gps.longitude + "  " + gps.latitude
                     )
+
                 }
             }
-                Text(
-                    text = sender,
-                    fontSize = 12.sp,
-                )
+            Text(
+                text = sender,
+                fontSize = 12.sp,
+            )
         }
     }
 
@@ -235,14 +247,13 @@ private fun NewMessage(
 
             )
             IconButton(onClick = {
-                modelPhotoBooth.takePhoto(model,currentPerson.name)
+                modelPhotoBooth.takePhoto(model, currentPerson.name)
             }) {
                 Icon(Icons.Filled.CameraAlt, contentDescription = "pic")
 
             }
             IconButton(onClick = {
-                message = gpsModel.rememberCurrentPosition(model)
-                loc = true
+                gpsModel.rememberCurrentPosition(model, currentPerson.name)
             }) {
                 Icon(Icons.Filled.LocationSearching, contentDescription = "loc")
             }

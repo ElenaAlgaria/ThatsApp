@@ -33,7 +33,6 @@ class ThatsAppModel(private val context: ComponentActivity) {
     var me by mutableStateOf("Elena")
     var greeting by mutableStateOf("The world needs more love")
 
-    var loc = false
     var currentScreen by mutableStateOf(AvailableScreen.OVERVIEW)
     val imagePic = loadImage(R.drawable.character)
 
@@ -87,13 +86,10 @@ class ThatsAppModel(private val context: ComponentActivity) {
             sender = me, receiver = name,
             message = message, imageUrl = imageURL, gps = gps
         )
-        if (imageURL != ""){
-        flap.imageBitmap = img
+        if (imageURL != "") {
+            flap.imageBitmap = img
         }
-        if (loc) {
-            message = ""
-            loc = false
-        }
+
         mqttConnector.publish(
             topic = mainTopic + "/" + name,
             message = flap,
@@ -141,8 +137,9 @@ class ThatsAppModel(private val context: ComponentActivity) {
         }
     }
 
-    fun geoToGps(geoPosition: GeoPosition): Gps {
-        return Gps(geoPosition.longitude.toString(), geoPosition.latitude.toString())
+    fun geoToGps(geoPosition: GeoPosition, name: String) {
+        gps = Gps(geoPosition.longitude.toString(), geoPosition.latitude.toString())
+        publish(name)
     }
 
     fun gpsToGeo(gps: Gps): GeoPosition {
