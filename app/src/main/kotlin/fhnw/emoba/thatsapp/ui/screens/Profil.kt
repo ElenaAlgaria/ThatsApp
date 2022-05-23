@@ -17,7 +17,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import fhnw.emoba.R
 import fhnw.emoba.modules.module07.flutter_solution.ui.theme.lightBlue100
+import fhnw.emoba.thatsapp.data.People
 import fhnw.emoba.thatsapp.model.AvailableScreen
 import fhnw.emoba.thatsapp.model.ThatsAppModel
 
@@ -39,7 +41,20 @@ private fun Bar(model: ThatsAppModel) {
         TopAppBar(
             title = { Text("Profil") },
             navigationIcon = {
-                IconButton(onClick = { currentScreen = AvailableScreen.OVERVIEW }) {
+                IconButton(onClick = {
+                    if (me != "Elena" && chatList.size <= 4){
+                        model.mqttConnector.disconnect()
+                        Thread.sleep(500)
+                        model.connectAndSubscribe()
+                        model.chatList.add(
+                            People(
+                                "Elena", message, mainTopic + "/Elena", loadImage(
+                                    R.drawable.elena
+                                )
+                            )
+                        )
+                    }
+                    currentScreen = AvailableScreen.OVERVIEW }) {
                     Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                 }
             },

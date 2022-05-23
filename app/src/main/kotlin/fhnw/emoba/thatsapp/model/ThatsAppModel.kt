@@ -36,7 +36,7 @@ class ThatsAppModel(private val context: ComponentActivity) {
     var currentScreen by mutableStateOf(AvailableScreen.OVERVIEW)
     val imagePic = loadImage(R.drawable.character)
 
-    private val mqttConnector by lazy { MqttConnector(mqttBroker) }
+     val mqttConnector by lazy { MqttConnector(mqttBroker) }
 
     var chatList = mutableStateListOf<People>()
 
@@ -63,7 +63,6 @@ class ThatsAppModel(private val context: ComponentActivity) {
         chatList.add(People("Milena", message, mainTopic + "/Milena", loadImage(R.drawable.milena)))
         chatList.add(People("Martin", message, mainTopic + "/Martin", loadImage(R.drawable.martin)))
         chatList.add(People("Lea", message, mainTopic + "/Lea", loadImage(R.drawable.lea)))
-
     }
 
     fun connectAndSubscribe() {
@@ -120,7 +119,6 @@ class ThatsAppModel(private val context: ComponentActivity) {
             downloadBitmapFromFileIO(url = flap.imageUrl,
                 onSuccess = {
                     flap.imageBitmap = it
-                    flap.imageUrl = ""
                 },
                 onDeleted = { downloadMessage = "File is deleted" },
                 onError = { downloadMessage = "Connection failed" })

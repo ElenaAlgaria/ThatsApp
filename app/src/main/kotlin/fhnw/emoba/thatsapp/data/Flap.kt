@@ -16,7 +16,6 @@ data class Flap(val sender: String = "",
 ) : Message {
     var imageBitmap by mutableStateOf(Bitmap.createBitmap(120,120, Bitmap.Config.ALPHA_8))
 
-// ned in constructor eif süscht en bitmap inneture und de luege nachem string ?
     constructor(json : JSONObject): this(json.getString("sender"),
                                          json.getString("receiver"),
                                          json.getString("message"),
