@@ -114,9 +114,10 @@ private fun Body(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel, gp
                 })
 
             NewMessage(model, modelPhotoBoothModel, gpsModel, Modifier.constrainAs(message) {
-                start.linkTo(parent.start, 10.dp)
-                end.linkTo(parent.end, 5.dp)
+                start.linkTo(parent.start, 20.dp)
+                end.linkTo(parent.end, 20.dp)
                 bottom.linkTo(parent.bottom, 20.dp)
+                width = Dimension.fillToConstraints
             })
         }
     }
@@ -235,7 +236,6 @@ private fun NewMessage(
     modifier: Modifier
 ) {
     with(model) {
-        Row(modifier = modifier) {
             val keyboard = LocalSoftwareKeyboardController.current
             OutlinedTextField(
                 value = message,
@@ -243,30 +243,31 @@ private fun NewMessage(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { keyboard?.hide() }),
                 shape = RoundedCornerShape(20.dp), textStyle = TextStyle(fontSize = 14.sp),
-                modifier = modifier.widthIn(250.dp, 250.dp)
+                modifier = modifier,
+                trailingIcon = {  Row(modifier = modifier) {
+                    IconButton(onClick = {
+                        modelPhotoBooth.takePhoto(model, currentPerson.name)
+                    }) {
+                        Icon(Icons.Filled.CameraAlt, contentDescription = "pic")
 
+                    }
+                    IconButton(onClick = {
+                        gpsModel.rememberCurrentPosition(model, currentPerson.name)
+                    }) {
+                        Icon(Icons.Filled.LocationSearching, contentDescription = "loc")
+                    }
+
+                    IconButton(onClick = {
+                        publish(currentPerson.name)
+                        message = ""
+                    }) {
+                        Icon(Icons.Filled.Send, contentDescription = "send")
+                    }
+                }}
             )
-            IconButton(onClick = {
-                modelPhotoBooth.takePhoto(model, currentPerson.name)
-            }) {
-                Icon(Icons.Filled.CameraAlt, contentDescription = "pic")
-
-            }
-            IconButton(onClick = {
-                gpsModel.rememberCurrentPosition(model, currentPerson.name)
-            }) {
-                Icon(Icons.Filled.LocationSearching, contentDescription = "loc")
-            }
-
-            IconButton(onClick = {
-                publish(currentPerson.name)
-                message = ""
-            }) {
-                Icon(Icons.Filled.Send, contentDescription = "send")
-            }
         }
     }
-}
+
 
 @Composable
 private fun Notification(model: ThatsAppModel, scaffoldState: ScaffoldState) {
