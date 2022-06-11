@@ -10,9 +10,7 @@ import fhnw.emoba.thatsapp.model.AvailableScreen
 import fhnw.emoba.thatsapp.model.GpsModel
 import fhnw.emoba.thatsapp.model.PhotoBoothModel
 import fhnw.emoba.thatsapp.model.ThatsAppModel
-import fhnw.emoba.thatsapp.ui.screens.OverviewChat
-import fhnw.emoba.thatsapp.ui.screens.Profil
-import fhnw.emoba.thatsapp.ui.screens.Roboto
+import fhnw.emoba.thatsapp.ui.screens.*
 
 
 @Composable
@@ -41,6 +39,9 @@ private fun Body(model: ThatsAppModel, modelPhotoBoothModel: PhotoBoothModel, gp
                    }
                    AvailableScreen.ROBOTO -> {
                        Roboto(model = model)
+                   }
+                   AvailableScreen.ADD_PERSON -> {
+                       NewPerson(model = model)
                    }
                }
 

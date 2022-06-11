@@ -4,5 +4,6 @@ enum class AvailableScreen() {
     CHAT(),
     OVERVIEW(),
     PROFIL(),
-    ROBOTO()
+    ROBOTO(),
+    ADD_PERSON()
 }

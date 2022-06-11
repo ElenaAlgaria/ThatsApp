@@ -1,12 +1,14 @@
 package fhnw.emoba.thatsapp.ui.screens
 
+import android.R.attr.label
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -15,19 +17,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import fhnw.emoba.R
-import fhnw.emoba.modules.module07.flutter_solution.ui.theme.gray300
 import fhnw.emoba.modules.module07.flutter_solution.ui.theme.lightBlue100
 import fhnw.emoba.thatsapp.model.AvailableScreen
 import fhnw.emoba.thatsapp.model.ThatsAppModel
 
-    @Composable
+
+@Composable
     fun Roboto(model: ThatsAppModel) {
         val scaffoldState = rememberScaffoldState()
         MaterialTheme(colors = lightColors(primary = lightBlue100)) {
@@ -62,7 +66,7 @@ private fun Body(model: ThatsAppModel) {
         }
 
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-            val (pic, greeting, btn, btnMore, phrasesBox) = createRefs()
+            val (pic, greeting, btnMore, phrasesBox) = createRefs()
 
             val margin = 30.dp
 
@@ -72,23 +76,26 @@ private fun Body(model: ThatsAppModel) {
                 end.linkTo(parent.end, margin)
                 width = Dimension.fillToConstraints
             })
-            if (visible){
-            Msg( Modifier.constrainAs(greeting){
-                top.linkTo(pic.bottom, 10.dp)
-                start.linkTo(parent.start, margin)
-                end.linkTo(parent.end, margin)
-                width = Dimension.fillToConstraints
-            })
 
-                Button(onClick = { visible = ! visible }, Modifier.constrainAs(btn) {
-                    top.linkTo(greeting.bottom, 10.dp)
+            if (visible) {
+                Msg(Modifier.constrainAs(greeting) {
+                    top.linkTo(pic.bottom, 10.dp)
                     start.linkTo(parent.start, margin)
                     end.linkTo(parent.end, margin)
+                    width = Dimension.fillToConstraints
+                })
+            }
 
-                }) {
-                    Text("Lets go", color = Color.Black)
-                }
-            } else {
+            Button(onClick = {
+                visible = false
+                nextPhrase() }, Modifier.constrainAs(btnMore){
+                start.linkTo(parent.start, margin)
+                end.linkTo(parent.end, margin)
+                bottom.linkTo(parent.bottom, 10.dp)
+
+            }) {
+                Text("More", color = Color.Black)
+            }
 
                 PhrasesBox(model.phrases, Modifier.constrainAs(phrasesBox){
                     start.linkTo(parent.start, margin)
@@ -99,21 +106,13 @@ private fun Body(model: ThatsAppModel) {
                     height = Dimension.fillToConstraints
                 })
 
-            Button(onClick = { nextPhrase() }, Modifier.constrainAs(btnMore){
-                start.linkTo(parent.start, margin)
-                end.linkTo(parent.end, margin)
-                bottom.linkTo(parent.bottom, 10.dp)
-
-            }) {
-                Text("More", color = Color.Black)
-            }
 
             }
 
 
         }
     }
-}
+
 
 @Composable
 private fun PhrasesBox(phrases: List<String>, modifier: Modifier){
@@ -124,7 +123,6 @@ private fun PhrasesBox(phrases: List<String>, modifier: Modifier){
         val scrollState = rememberLazyListState()
         LazyColumn(
             state = scrollState,
-           // modifier = Modifier.align(Alignment.TopCenter)
 
             ) {
             items(phrases) { SinglePhrase(it) }
@@ -136,14 +134,18 @@ private fun PhrasesBox(phrases: List<String>, modifier: Modifier){
     }
 
 @Composable
+@OptIn(ExperimentalMaterialApi::class)
 private fun SinglePhrase(phrase: String){
+    val localClipboardManager = LocalClipboardManager.current
     Column( modifier = Modifier
         .fillMaxWidth()
         .padding(horizontal = 25.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
         Card(
             modifier = Modifier.widthIn(max = 340.dp), shape = RoundedCornerShape(16.dp),
-            backgroundColor = MaterialTheme.colors.secondary
+            backgroundColor = MaterialTheme.colors.secondary,
+            onClick = {
+                localClipboardManager.setText(AnnotatedString(phrase))}
         ) {
 
             Text(text     = phrase,
@@ -153,17 +155,6 @@ private fun SinglePhrase(phrase: String){
             )
         }
     }
-    
-    
-    /*
-    Box(modifier = Modifier
-        .height(phrase.length.dp + 30.dp)
-        .padding(vertical = 30.dp, horizontal = 40.dp)){
-        Text(phrase, Modifier.align(Alignment.TopCenter))
-    }
-   Divider()
-
-     */
 
 }
 

@@ -42,18 +42,6 @@ private fun Bar(model: ThatsAppModel) {
             title = { Text("Profil") },
             navigationIcon = {
                 IconButton(onClick = {
-                    if (me != "Elena" && chatList.size <= 4){
-                        model.mqttConnector.disconnect()
-                        Thread.sleep(500)
-                        model.connectAndSubscribe()
-                        model.chatList.add(
-                            People(
-                                "Elena", message, mainTopic + "/Elena", loadImage(
-                                    R.drawable.elena
-                                )
-                            )
-                        )
-                    }
                     currentScreen = AvailableScreen.OVERVIEW }) {
                     Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                 }
@@ -68,7 +56,7 @@ private fun Bar(model: ThatsAppModel) {
 private fun Body(model: ThatsAppModel) {
     with(model) {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-            val (pic, name, greeting) = createRefs()
+            val (pic, name, greeting, btnSave) = createRefs()
 
             val margin = 20.dp
 
@@ -76,6 +64,7 @@ private fun Body(model: ThatsAppModel) {
                 top.linkTo(parent.top, margin)
                 start.linkTo(parent.start, margin)
                 end.linkTo(parent.end, margin)
+                bottom.linkTo(name.top, margin)
                 width = Dimension.fillToConstraints
             })
 
@@ -83,6 +72,7 @@ private fun Body(model: ThatsAppModel) {
                 start.linkTo(parent.start,35.dp)
                 top.linkTo(pic.bottom, margin)
                 end.linkTo(parent.end, 35.dp)
+                bottom.linkTo(greeting.top, margin)
                 width = Dimension.fillToConstraints
             })
 
@@ -90,8 +80,23 @@ private fun Body(model: ThatsAppModel) {
                 start.linkTo(parent.start,35.dp)
                 top.linkTo(name.bottom, margin)
                 end.linkTo(parent.end, 35.dp)
+                bottom.linkTo(btnSave.top, margin)
                 width = Dimension.fillToConstraints
             })
+
+            Button(onClick = {model.mqttConnector.disconnect()
+                Thread.sleep(500)
+                model.connectAndSubscribe()
+                currentScreen = AvailableScreen.OVERVIEW
+                 }, Modifier.constrainAs(btnSave){
+                top.linkTo(greeting.bottom, margin)
+                start.linkTo(parent.start, margin)
+                end.linkTo(parent.end, margin)
+                bottom.linkTo(parent.bottom, margin)
+
+            }) {
+                Text("Save", color = Color.Black)
+            }
 
         }
     }
@@ -141,3 +146,4 @@ private fun ImageProfil(bitmap: ImageBitmap, modifier: Modifier) {
         )
     )
 }
+

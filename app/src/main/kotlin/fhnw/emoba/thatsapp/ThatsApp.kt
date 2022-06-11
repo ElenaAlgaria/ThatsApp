@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import fhnw.emoba.EmobaApp
 import fhnw.emoba.modules.module09.gps.data.GPSConnector
 import fhnw.emoba.thatsapp.data.CameraAppConnector
+import fhnw.emoba.thatsapp.data.Fact_2.APIFact
 import fhnw.emoba.thatsapp.model.GpsModel
 import fhnw.emoba.thatsapp.model.PhotoBoothModel
 import fhnw.emoba.thatsapp.model.ThatsAppModel
@@ -17,10 +18,11 @@ object ThatsApp : EmobaApp {
     private lateinit var gpsModel: GpsModel
 
     override fun initialize(activity: ComponentActivity) {
-        model = ThatsAppModel(activity)
+        val ser = APIFact()
+        model = ThatsAppModel(activity, ser)
         val cameraAppConnector = CameraAppConnector(activity)
         modelPhotoBoothModel = PhotoBoothModel(cameraAppConnector)
-        model.connectAndSubscribe()
+
         model.handlePeople()
         val gps = GPSConnector(activity)
         gpsModel = GpsModel(activity, gps)

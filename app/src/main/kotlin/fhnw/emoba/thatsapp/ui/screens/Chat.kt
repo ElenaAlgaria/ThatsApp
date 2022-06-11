@@ -1,5 +1,6 @@
 package fhnw.emoba.thatsapp.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -39,6 +40,8 @@ import fhnw.emoba.thatsapp.model.AvailableScreen
 import fhnw.emoba.thatsapp.model.GpsModel
 import fhnw.emoba.thatsapp.model.PhotoBoothModel
 import fhnw.emoba.thatsapp.model.ThatsAppModel
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 @Composable
@@ -154,6 +157,7 @@ private fun AllFlaps(flaps: List<Flap>, model: ThatsAppModel, gpsModel: GpsModel
     }
 }
 
+@SuppressLint("SimpleDateFormat")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun SingleFlap(flap: Flap, model: ThatsAppModel, gpsModel: GpsModel, photoBoothModel: PhotoBoothModel) {
@@ -210,8 +214,10 @@ private fun SingleFlap(flap: Flap, model: ThatsAppModel, gpsModel: GpsModel, pho
 
                 }
             }
+           val time = SimpleDateFormat("HH:mm")
+            time.timeZone = TimeZone.getTimeZone("Europe/Berlin")
             Text(
-                text = sender,
+                text = time.format(Date()),
                 fontSize = 12.sp,
             )
         }

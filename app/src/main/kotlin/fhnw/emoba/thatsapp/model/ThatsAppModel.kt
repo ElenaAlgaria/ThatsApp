@@ -18,12 +18,13 @@ import fhnw.emoba.R
 import fhnw.emoba.modules.module07.flutter_solution.data.MqttConnector
 import fhnw.emoba.modules.module09.gps.data.GeoPosition
 import fhnw.emoba.thatsapp.data.*
+import fhnw.emoba.thatsapp.data.Fact_2.APIFact
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-class ThatsAppModel(private val context: ComponentActivity) {
+class ThatsAppModel(private val context: ComponentActivity, val ser: APIFact) {
     var title = ""
     val mqttBroker = "broker.hivemq.com"
     val mainTopic = "fhnw/emoba/thatsapp"
@@ -34,11 +35,13 @@ class ThatsAppModel(private val context: ComponentActivity) {
     var imageURL by mutableStateOf("")
     var location by mutableStateOf(GeoPosition())
     var gps by mutableStateOf(Gps())
-    var me by mutableStateOf("Elena")
+    var me by mutableStateOf("")
+    var newPerson by mutableStateOf("")
+
     var greeting by mutableStateOf("The world needs more love")
 
-    var currentScreen by mutableStateOf(AvailableScreen.OVERVIEW)
-    val imagePic = loadImage(R.drawable.character)
+    var currentScreen by mutableStateOf(AvailableScreen.PROFIL)
+    val imagePic = loadImage(R.drawable.profil)
 
      val mqttConnector by lazy { MqttConnector(mqttBroker) }
 
@@ -58,7 +61,7 @@ class ThatsAppModel(private val context: ComponentActivity) {
 
     fun nextPhrase() {
         modelScope.launch {
-            phrases.add(Fact.generateMsg())
+            phrases.add(ser.getData())
         }
     }
 
