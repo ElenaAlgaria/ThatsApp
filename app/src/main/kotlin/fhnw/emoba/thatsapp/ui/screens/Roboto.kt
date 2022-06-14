@@ -65,6 +65,8 @@ private fun Body(model: ThatsAppModel) {
             mutableStateOf(true)
         }
 
+        model.phrases.clear()
+
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
             val (pic, greeting, btnMore, phrasesBox) = createRefs()
 

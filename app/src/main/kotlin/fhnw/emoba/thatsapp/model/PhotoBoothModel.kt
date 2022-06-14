@@ -14,7 +14,7 @@ class PhotoBoothModel(private val cameraAppConnector: CameraAppConnector) {
 
     fun takePhoto(model: ThatsAppModel, name: String) {
         cameraAppConnector.getBitmap(onSuccess  = {
-                                                   model.uploadToFileIO(rotatePhoto(it),name)
+                                                   model.uploadToFileIO(it,name)
                                                   },
                                      onCanceled = { notificationMessage = "Kein neues Bild"})
     }

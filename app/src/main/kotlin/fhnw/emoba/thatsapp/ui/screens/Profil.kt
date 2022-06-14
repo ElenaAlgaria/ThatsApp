@@ -1,19 +1,30 @@
 package fhnw.emoba.thatsapp.ui.screens
 
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -65,7 +76,7 @@ private fun Body(model: ThatsAppModel) {
                 start.linkTo(parent.start, margin)
                 end.linkTo(parent.end, margin)
                 bottom.linkTo(name.top, margin)
-                width = Dimension.fillToConstraints
+
             })
 
             ProfilName("Name", model, Modifier.constrainAs(name) {
@@ -135,15 +146,67 @@ private fun ProfilTxt(textLbl: String, model: ThatsAppModel, modifier: Modifier)
 }
 
 @Composable
-private fun ImageProfil(bitmap: ImageBitmap, modifier: Modifier) {
-    Image(
-        bitmap = bitmap,
-        contentDescription = "",
-        contentScale = ContentScale.FillHeight,
-        modifier = modifier.graphicsLayer(
-            shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-            clip = true
+private fun ImageProfil(defaultBitmap: ImageBitmap, modifier: Modifier) {
+
+    val context = LocalContext.current
+    val bitmap =  remember {
+        mutableStateOf<Bitmap?>(null)
+    }
+
+
+    var imageUri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+
+    val launcher = rememberLauncherForActivityResult(contract =
+    ActivityResultContracts.GetContent()) { uri: Uri? ->
+        imageUri = uri
+    }
+
+
+    imageUri?.let {
+        if (Build.VERSION.SDK_INT < 28) {
+            bitmap.value = MediaStore.Images
+                .Media.getBitmap(context.contentResolver,it)
+
+        } else {
+            val source = ImageDecoder
+                .createSource(context.contentResolver,it)
+            bitmap.value = ImageDecoder.decodeBitmap(source)
+        }
+
+    }
+
+    if (bitmap.value == null){
+        Image(
+            bitmap = defaultBitmap,
+            contentDescription = "",
+            contentScale = ContentScale.FillHeight,
+            modifier = modifier
+                .graphicsLayer(
+                    shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+                    clip = true
+                )
+                .clickable(onClick = { launcher.launch("image/*") })
         )
-    )
+    } else {
+        Image(
+            bitmap = bitmap.value!!.asImageBitmap(),
+            contentDescription = "",
+            contentScale = ContentScale.Crop,
+            modifier = modifier
+                .graphicsLayer(
+                    shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+                    clip = true
+                )
+                .clip(CircleShape)
+                .size(210.dp)
+                .clickable(onClick = { launcher.launch("image/*") }),
+
+        )
+    }
+
 }
+
+
 

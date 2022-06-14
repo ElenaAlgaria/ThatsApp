@@ -58,6 +58,7 @@ private fun Body(model: ThatsAppModel) {
             Spacer(modifier = Modifier.padding(0.dp, 20.dp))
 
             Button(onClick = {
+                if (model.newPerson != "Elena"){
                         model.chatList.add(
                             People(
                                 model.newPerson, message, mainTopic + "/${model.newPerson}", loadImage(
@@ -65,6 +66,16 @@ private fun Body(model: ThatsAppModel) {
                                 )
                             )
                         )
+
+                } else {
+                    model.chatList.add(
+                        People(
+                            model.newPerson, message, mainTopic + "/${model.newPerson}", loadImage(
+                                R.drawable.elena
+                            )
+                        )
+                    )
+                }
 
                 currentScreen = AvailableScreen.OVERVIEW
             }) {
